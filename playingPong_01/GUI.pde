@@ -18,6 +18,7 @@ void setupGUI() {
     .setPosition(15, 10)
       .setRange(0.0, 0.3)
         .setGroup(diffGroup)
+        .init();
           ;
   cp5.addSlider("diffMaxValue")
     .setPosition(15, 30)
@@ -27,19 +28,22 @@ void setupGUI() {
 
   cp5.addSlider("blurLevel").
     setPosition(15, 50)
-    .setRange(1, 15)
+    .setRange(1, 105)
       .setGroup(diffGroup)
+              .init();
         ;
 
   cp5.addSlider("cvth")
     .setPosition(15, 70)
       .setRange(1, 100)
-        .setGroup(diffGroup);
+        .setGroup(diffGroup)
+                .init();;
         
   cp5.addSlider("gain")
     .setPosition(15, 90)
       .setRange(0.01, 4.0)
-        .setGroup(diffGroup);
+        .setGroup(diffGroup)
+                .init();;
         
         
   Group detectGroup = cp5.addGroup("detect")

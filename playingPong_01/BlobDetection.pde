@@ -4,6 +4,7 @@ float x1 = 0.185;
 float x2 = 0.84;
 float y1 = 0.13;
 float y2 = 0.89;
+ArrayList<Blob> valid;
 
 void setupBD(int w, int h) {
   bd = createGraphics(w, h, P3D);
@@ -52,6 +53,14 @@ ArrayList<Blob> bdSize(ArrayList<Blob> blobs, float maxWidth, float maxHeight) {
     if ( b.w < maxWidth && b.h < maxHeight) valids.add(b);
   }
   return valids;
+}
+
+void saveValids(ArrayList<Blob> blobs){
+  valid = blobs;
+}
+
+Blob getMovingBlob(){
+  return theBlobDetection.getBlobNb() > 0 ? theBlobDetection.getBlob(0) : null;
 }
 
 void drawRoi() {

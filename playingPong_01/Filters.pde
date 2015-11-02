@@ -1,21 +1,25 @@
 PShader diff;
 PGraphics diffBuffer;
 PGraphics bg;
-float diffMinValue = 0.0;
+float diffMinValue = 0.01;
 float diffMaxValue = 0.1;
 
-float gain = 1;
+float gain = 1.0;
 int filterW = 720;
 int filterH = 480;
 
+
+
+
 void setupFilters(){
+  
   bg = createGraphics(filterW, filterH, P3D);
   diffBuffer = createGraphics(filterW, filterH, P3D);
 
   diff = loadShader("shaders/diff.glsl");
   diff.set("diffMinValue", diffMinValue);
   diff.set("diffMaxValue", diffMaxValue);
-  
+  diff.set("gain", gain);
 }
 
 
