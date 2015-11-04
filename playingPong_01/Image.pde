@@ -30,7 +30,7 @@ PImage getFeed() {
 }
 
 PImage cvblur(PImage difference) {
-  println("cvblur()");
+ // println("cvblur()");
   opencv.loadImage(difference);
   opencv.blur(blurLevel);  
   return opencv.getSnapshot();

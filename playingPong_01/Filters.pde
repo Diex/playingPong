@@ -34,7 +34,7 @@ void setBackground(PImage image){
 
 PImage getdiff(PImage video){    
   if (diffBuffer != null && video != null) { 
-        println("diff()");      
+       // println("diff()");      
         diffBuffer.beginDraw();
         diffBuffer.background(0);
         diffBuffer.shader(diff); // si uso el shader como filtro tiene que ser de tipo TEXTURE

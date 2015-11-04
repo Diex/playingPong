@@ -19,7 +19,7 @@ void detectBlobs(PImage img) {
   
   ArrayList<Blob> filterRoi = bdRoi(blobs, x1, x2, y1, y2);  
   ArrayList<Blob> filterSize = bdSize(filterRoi, 0.1, 0.1);
-  println(filterSize.size());
+//  println(filterSize.size());
   bd.beginDraw();
   bd.background(0);
   bd.endDraw();
@@ -27,7 +27,7 @@ void detectBlobs(PImage img) {
   for (Blob b : filterSize) {
     drawBlobAndEdge(b, true, true);
   }
-  
+  valid = filterSize;
   drawRoi();
 }
 
@@ -60,7 +60,8 @@ void saveValids(ArrayList<Blob> blobs){
 }
 
 Blob getMovingBlob(){
-  return theBlobDetection.getBlobNb() > 0 ? theBlobDetection.getBlob(0) : null;
+   return valid.size() > 0 ? valid.get(0) : null;
+  //return theBlobDetection.getBlobNb() > 0 ? theBlobDetection.getBlob(0) : null;
 }
 
 void drawRoi() {
