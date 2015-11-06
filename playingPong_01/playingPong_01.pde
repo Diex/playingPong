@@ -7,8 +7,8 @@ import blobDetection.*;
 
 Court court;
 
-int debugWidth;
-int debugHeight;
+int debugWindowW;
+int debugWindowH;
 
 PImage blur;
 PImage difference;
@@ -17,36 +17,46 @@ Pad playerR;
 Pad playerL;
 boolean calibrate = false; 
 
+int padR_min, padL_min =0;
+int padR_max, padL_max =255;
 void setup() {
-  size(1024, 768, P3D);
-  
-  court = new Court(this);
-  
+  size(1366, 768, P3D);
+  // ----------------------------------------------------------------------
+  // hardware
+  // ----------------------------------------------------------------------
+
   setupArduino();
   setupCam();  
   feed = updateCam();
-    
+
   setupBD(feed.width, feed.height);
   setupFilters();
   setBackground(feed); 
-  
-  debugWidth = width - feed.width;
-  debugHeight = feed.height * (width - feed.width) / feed.width;
-  
+
   setupGUI();
-  
+  cp5.loadProperties();
+
+  debugWindowW = (int) ((width - feed.width) * 0.75);
+  debugWindowH = (int) ((feed.height * (width - feed.width) / feed.width) * 0.75);
+
+  // ----------------------------------------------------------------------
+  // juego
+  // ----------------------------------------------------------------------
+
+  court = new Court(this);
+
   playerR = new Pad(court);
   playerR.side = Pad.RIGHT;
   playerR.setxPos(0.975);
-  
+
   playerL = new Pad(court);
   playerL.side = Pad.LEFT;  
   playerL.setxPos(0.025);
-  
-  
+
+
   updateServoR(0.5);
   updateServoL(0.5);
- }
+}
 
 void draw() {
   background(0);
@@ -56,40 +66,59 @@ void draw() {
   setBackground(feed);  
   blur = cvblur(difference);  
   detectBlobs(blur);
-  
+
   // pads
-  if(!calibrate){
-    court.updateBall(getMovingBlob());
-    updateServoR(map(playerR.follow() , 0, 1, 45, 145) - 10 );
-    updateServoL(map(playerL.follow() , 0, 1, 45, 145) - 10 );
-  }else{
-    court.setBallPosition(mouseX * 1.0 / width,mouseY * 1.0 / height);
-    updateServoR(map(1 - court.ball.p.y , 0, 1, 45, 155));
-    updateServoL(map(1 - court.ball.p.y , 0, 1, 45, 145));
-    println(1 - court.ball.p.y);    
+  if (calibrate) {
+    court.setBallPosition(ballPos.arrayValue()[0] * 1.0 / 100, ballPos.arrayValue()[1] * 1.0 / 100);
+    updateServoR(map(court.ball.p.y, 1, 0, padR_min, padR_max));
+    updateServoL(map(court.ball.p.y, 1, 0, padL_min, padL_max));
+    println(1 - court.ball.p.y);
+  } else {
+    court.update(getMovingBlob());
+    updateServoR(map(playerR.follow(), 1, 0, padR_min, padR_max));
+    updateServoL(map(playerL.follow(), 1, 0, padL_min, padL_max));
   }
- 
-  
+
+
 
   court.clear();
   court.drawPad(playerR);
   court.drawPad(playerL);
   court.drawBall();
-  court.drawCollision(court.bounce());
+  PVector bounce = court.bounce();
+  court.drawCollision(bounce);
+  court.drawReflection(bounce, court.getReflection(bounce));
   
-  
-  image(feed, 0, 0);
-  image(court.render() , 0, 0);
-  image(bd,   feed.width, 0, debugWidth, debugHeight   );
-  image(feed, feed.width, debugHeight, debugWidth, debugHeight);
+  court.drawCollision(court.getCollisionWithPad(playerR));
+  court.drawCollision(court.getCollisionWithPad(playerL));
+
+  image(feed, -5, 0);
+  image(court.render(), 0, 0);
+  image(bd, feed.width, 0, debugWindowW, debugWindowH   );
+  image(feed, feed.width, debugWindowH, debugWindowW, debugWindowH);
   drawControls();
-  
 }
 
-void keyPressed(){
-    if(key == 'c') calibrate = !calibrate;    
-    if(key == 'r') {
-      playerR.reset();
-      playerL.reset();
-    }    
+public void centerPads() {
+  println("center pads");
+  updateServoR(map(0.5, 0, 1, 45, 145) - 10 );
+  updateServoL(map(0.5, 0, 1, 45, 145) - 10 );
 }
+
+public void calibrate(boolean flag) {
+  println("Calibrate");
+  calibrate = flag;
+}
+
+
+void keyPressed() {
+  if (key == 'c') calibrate = !calibrate;    
+  if (key == 'r') {
+    playerR.reset();
+    playerL.reset();
+  }
+
+  if (key == 's') cp5.saveProperties();
+  if (key == 'l') cp5.loadProperties();
+}
+

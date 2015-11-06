@@ -1,4 +1,4 @@
-     import point2line.*;
+import point2line.*;
 
 class Pad {
   // my side of the court
@@ -22,21 +22,23 @@ class Pad {
 
   float follow() {
     if ((int) Math.signum(court.ball.dir().x) != side) {
-      p.y = 0.5;
-      return 1 - p.y;
+      return p.y;
     }
-    p.y = court.ball.p.y;    
-    return 1 - p.y;
-  
+    PVector collision = court.getCollisionWithPad(this);
+    // la pelota choca directamente
+    if (collision != null && collision.y > 0.0 && collision.y < 1.0) {        
+      p.y = collision.y;
+    }
+    return p.y;
   }
-  
-  void reset(){
+
+  void reset() {
     println("padReset");
     p.y = 0.5;
   }
 
 
- 
+
 
   public PVector reflect(PVector vector, PVector normal)
   {

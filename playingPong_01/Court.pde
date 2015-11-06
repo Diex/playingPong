@@ -35,24 +35,32 @@ class Court {
     ball = new Ball();
   }
 
-  void updateBall(Blob blob) {
-    if (blob == null) return;
-    
-    setBallPosition(blob.x, blob.y);
+  void update(Blob blob) {
+    if (blob == null) return;    
+    PVector v = getCourtPositionFromBlob(blob);    
+    setBallPosition(v.x, v.y);
   }
-  
-  void setBallPosition(float x, float y) {
-    ball.pp.x = ease(ball.pp.x, ball.p.x, 0.1);
-    ball.pp.y = ease(ball.pp.y, ball.p.y, 0.1);
-    
+
+  PVector getCourtPositionFromBlob(Blob blob) {
     // normalized blob to screen
-    float screenX = PApplet.map(x, 0, 1, 0, pg.width);
-    float screenY = PApplet.map(y, 0, 1, 0, pg.height); 
+    // porque el blob detection esta viendo toda la imagen
+    float screenX = PApplet.map(blob.x, 0, 1, 0, pg.width);
+    float screenY = PApplet.map(blob.y, 0, 1, 0, pg.height);
     // screen to norm limits frame
-    ball.p.x = PApplet.map(screenX, xx1, xx2, 0.0, 1.0) ;
-    ball.p.y = PApplet.map(screenY, yy1, yy2, 0.0, 1.0);
+    float nx = PApplet.map(screenX, xx1, xx2, 0.0, 1.0) ;
+    float ny = PApplet.map(screenY, yy1, yy2, 0.0, 1.0);
+    println("ball position: ", nx, ny);
+    return new PVector(nx, ny);
   }
-  
+
+  void setBallPosition(float x, float y) {
+    ball.pp.x = ball.p.x;
+    ball.pp.y = ball.p.y;
+    ball.p.x = ease(x, ball.pp.x, 0.95);
+    ball.p.y = ease(y, ball.pp.y, 0.95);
+    
+  }
+
   public PVector bounce() {
     PVector collision = new PVector();
     Vect2[] line1 = new Vect2[ 2 ];
@@ -62,9 +70,12 @@ class Court {
     Vect2[]line2 = new Vect2[ 2 ];
 
     if (court.ball.dir().y <= 0) { // choca arriba
+      
+      println("rebota arriba");
       line2[ 0 ] = new Vect2((float) top.getX1(), (float) top.getY1());
       line2[ 1 ] = new Vect2((float) top.getX2(), (float) top.getY2()); // will be updateed by the mouse
     } else { //choca abajo
+      println("rebota abajo");
       line2[ 0 ] = new Vect2((float) bottom.getX1(), (float) bottom.getY1());
       line2[ 1 ] = new Vect2((float) bottom.getX2(), (float) bottom.getY2()); // will be updateed by the mouse
     }
@@ -72,7 +83,7 @@ class Court {
     Vect2 intersectionPoint = Space2.lineIntersection( line1[ 0 ], line1[ 1 ], line2[ 0 ], line2[ 1 ] );
 
     if ( intersectionPoint != null ) {
-      println("ÏNTERSECTION");
+//      println("ÏNTERSECTION");
       collision.x = intersectionPoint.x;
       collision.y = intersectionPoint.y;
     }
@@ -80,6 +91,72 @@ class Court {
     return collision;
   }
 
+  PVector getReflection(PVector bounce) {
+    PVector target = new PVector();
+    // si no hay una colision directa puede que haya una colision contra la pared      
+
+    // si existe esa colision
+    if (bounce.x > 0 && bounce.x < 1) {
+      // caculo la direccion entre ese punto y la direccion reflejada en el eje y
+      PVector normal = bounce.y > 0.5 ? new PVector(0, -1) : new PVector(0, 1);
+
+      // normalized incidence vector
+      PVector incidence = PVector.mult(court.ball.dir(), -1);
+      incidence.normalize();
+
+      // calculate dot product of incident vector and base top normal 
+      float dot = incidence.dot(normal);
+
+      // calculate reflection vector
+      // assign reflection vector to direction vector
+      target.set(2*normal.x*dot - incidence.x, 2*normal.y*dot - incidence.y, 0);
+    }
+    return target;
+  }
+
+
+  private PVector getCollision(PVector bounce, PVector direction, PVector a, PVector b)
+  {
+    PVector collision = new PVector();
+    Vect2[] line1 = new Vect2[ 2 ];
+    line1[ 0 ] = new Vect2( bounce.x, bounce.y );
+    line1[ 1 ] = new Vect2( bounce.x + direction.x, bounce.y + direction.y );
+
+    Vect2[]line2 = new Vect2[ 2 ];
+
+    line2[ 0 ] = new Vect2((float) a.x, (float) a.y);
+    line2[ 1 ] = new Vect2((float) b.x, (float) b.y); // will be updateed by the mouse
+
+
+    Vect2 intersectionPoint = Space2.lineIntersection( line1[ 0 ], line1[ 1 ], line2[ 0 ], line2[ 1 ] );
+
+    if ( intersectionPoint != null ) {
+      collision.x = intersectionPoint.x;
+      collision.y = intersectionPoint.y;
+    }
+    
+    return collision;
+  }
+  
+  public PVector getCollisionWithPad(Pad p) {
+
+    PVector collision = getCollision(ball.p, ball.dir(), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
+    
+    if (collision != null && collision.y > 0.0 && collision.y < 1.0) {        
+      println("colision en: ", collision.x, collision.y);  
+      // itero sobre los bounces
+        return collision;        
+        
+    }else{
+        println("buscar refleccion: ");
+        PVector bounce = bounce();        
+        collision = getCollision(bounce, getReflection(bounce), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
+        println("refleccion en: ", collision.x , collision.y);
+        return collision;        
+    }
+    
+    
+  }
 
   void clear() {
     pg.beginDraw();
@@ -116,6 +193,8 @@ class Court {
     pg.popStyle();
     pg.endDraw();
   }
+
+
   void drawBall() {
     pg.beginDraw();
     pg.pushStyle();
@@ -153,6 +232,42 @@ class Court {
     pg.endDraw();
   }
 
+
+  void drawReflection(PVector collision, PVector newdir) {
+    pg.beginDraw();
+    pg.pushStyle();
+    pg.noFill();
+    pg.stroke(0, 0, 255);
+    pg.ellipse( 
+    PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
+    PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
+    12, 12
+      );   
+
+
+    pg.strokeWeight(0.5);
+    pg.stroke(255, 255, 255);
+    // direction
+    pg.line(
+    PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
+    PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
+    PApplet.map((float) collision.x, 0, 1, xx1, xx2) + newdir.x * 500, 
+    PApplet.map((float) collision.y, 0, 1, yy1, yy2) + newdir.y * 500
+      );
+
+    pg.strokeWeight(0.51);
+    pg.stroke(255, 255, 255);
+    // crosshatch
+    pg.line(
+    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy1, 
+    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy2);
+    pg.line(
+    xx1, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
+    xx2, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2));
+
+    pg.popStyle();
+    pg.endDraw();
+  }
 
   PImage render() {
     pg.beginDraw();
