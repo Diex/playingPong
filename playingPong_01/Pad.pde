@@ -29,6 +29,11 @@ class Pad {
     return 1 - p.y;
   
   }
+  
+  void reset(){
+    println("padReset");
+    p.y = 0.5;
+  }
 
 
  

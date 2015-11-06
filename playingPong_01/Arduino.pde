@@ -46,14 +46,13 @@ void setupArduino() {
   
   // Configure digital pins 4 and 7 to control servo motors.
   arduino.pinMode(9, Arduino.SERVO);
-  arduino.pinMode(7, Arduino.SERVO);
+  arduino.pinMode(11, Arduino.SERVO);
 }
 
 void updateServoR(float val) {
-//  background(constrain(mouseX / 2, 0, 180));
-  // Write an value to the servos, telling them to go to the corresponding
-  // angle (for standard servos) or move at a particular speed (continuous
-  // rotation servos).
- // arduino.servoWrite(7, constrain(mouseX / 2, 0, 180));
-  arduino.servoWrite(9, (int) val); // constrain((int) map(val, 0, 1, 0, 180), 0, 180)
+ arduino.servoWrite(9, (int) val); // constrain((int) map(val, 0, 1, 0, 180), 0, 180)
+}
+
+void updateServoL(float val) {
+ arduino.servoWrite(11, (int) val); // constrain((int) map(val, 0, 1, 0, 180), 0, 180)
 }

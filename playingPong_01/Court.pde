@@ -42,8 +42,8 @@ class Court {
   }
   
   void setBallPosition(float x, float y) {
-    ball.pp.x = ease(ball.pp.x, ball.p.x, 0.);
-    ball.pp.y = ease(ball.pp.y, ball.p.y, 0.);
+    ball.pp.x = ease(ball.pp.x, ball.p.x, 0.1);
+    ball.pp.y = ease(ball.pp.y, ball.p.y, 0.1);
     
     // normalized blob to screen
     float screenX = PApplet.map(x, 0, 1, 0, pg.width);

@@ -9,16 +9,19 @@ Court court;
 
 int debugWidth;
 int debugHeight;
+
 PImage blur;
 PImage difference;
 PImage feed;
-Pad player;
-
+Pad playerR;
+Pad playerL;
 boolean calibrate = false; 
 
 void setup() {
   size(1024, 768, P3D);
+  
   court = new Court(this);
+  
   setupArduino();
   setupCam();  
   feed = updateCam();
@@ -31,35 +34,46 @@ void setup() {
   debugHeight = feed.height * (width - feed.width) / feed.width;
   
   setupGUI();
-  player = new Pad(court);  
-  player.setxPos(0.975);
+  
+  playerR = new Pad(court);
+  playerR.side = Pad.RIGHT;
+  playerR.setxPos(0.975);
+  
+  playerL = new Pad(court);
+  playerL.side = Pad.LEFT;  
+  playerL.setxPos(0.025);
+  
+  
   updateServoR(0.5);
+  updateServoL(0.5);
  }
 
 void draw() {
   background(0);
-  
+  // video processing  
   feed = updateCam();
-  
   difference = getdiff(feed);  
   setBackground(feed);  
   blur = cvblur(difference);  
   detectBlobs(blur);
   
-  
+  // pads
   if(!calibrate){
     court.updateBall(getMovingBlob());
-    updateServoR(map(player.follow() , 0, 1, 45, 145) - 10 );
+    updateServoR(map(playerR.follow() , 0, 1, 45, 145) - 10 );
+    updateServoL(map(playerL.follow() , 0, 1, 45, 145) - 10 );
   }else{
     court.setBallPosition(mouseX * 1.0 / width,mouseY * 1.0 / height);
-    updateServoR(map(1 - court.ball.p.y , 0, 1, 45, 145));
+    updateServoR(map(1 - court.ball.p.y , 0, 1, 45, 155));
+    updateServoL(map(1 - court.ball.p.y , 0, 1, 45, 145));
     println(1 - court.ball.p.y);    
   }
  
   
 
   court.clear();
-  court.drawPad(player);
+  court.drawPad(playerR);
+  court.drawPad(playerL);
   court.drawBall();
   court.drawCollision(court.bounce());
   
@@ -74,5 +88,8 @@ void draw() {
 
 void keyPressed(){
     if(key == 'c') calibrate = !calibrate;    
-    println("servoR");
+    if(key == 'r') {
+      playerR.reset();
+      playerL.reset();
+    }    
 }

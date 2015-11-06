@@ -7,7 +7,7 @@ class Ball{
   Ball(){
     p = new PVector();
     pp = new PVector();
-//    d = new PVector(); 
+
   }
   
 //  void infereFromBlob(Blob b){
