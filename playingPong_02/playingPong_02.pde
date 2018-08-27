@@ -7,8 +7,6 @@ import blobDetection.*;
 
 Court court;
 
-int debugWindowW;
-int debugWindowH;
 
 PImage cv;
 PImage feed;
@@ -26,11 +24,9 @@ int padR_max, padL_max = 255;
 
 void setup() {
   size(1366, 768, P3D);
-
   // ----------------------------------------------------------------------
   // hardware
   // ----------------------------------------------------------------------
-
   setupArduino();
   setupCam();  
   feed = updateCam();
@@ -38,14 +34,10 @@ void setup() {
 
   setupBD(feed);
   setupFilters(feed);
-  //setBackground(feed); 
-
+  
   setupGUI();
   cp5.loadProperties();
   
-  debugWindowW = (int) ((width - feed.width) * 0.75);
-  debugWindowH = (int) ((feed.height * (width - feed.width) / feed.width) * 0.75);
-
   // ----------------------------------------------------------------------
   // juego
   // ----------------------------------------------------------------------
@@ -54,18 +46,17 @@ void setup() {
 
   playerR = new Pad(court);
   playerR.side = Pad.RIGHT;
-  playerR.setxPos(0.5);
+  playerR.setPos(0.97, 0.5);
 
   playerL = new Pad(court);
   playerL.side = Pad.LEFT;  
-  playerL.setxPos(0.5);
+  playerL.setPos(0.03, 0.5);
 }
 
 void draw() {
   background(0);
-  // video processing  
+  
   feed = updateCam();
-
   int w = feed.width;
   int h = feed.height;
   
@@ -74,16 +65,12 @@ void draw() {
   cv = getCV();
   image(cv, w, 0, w/2,h/2);
   
-  difference = getdiff(feed);  
-  setBackground(feed);
+  difference = getdiff(cv);  
+  setBackground(cv);
   
-  image(difference, w, h/2, w/2,h/2);
-  
-  
-  //blur = cvblur(difference);  
+  image(difference, w, h/2, w/2,h/2);  
   detectBlobs(difference);
-  
-  
+   
   image(bd, w+w/2, 0   );
   drawCourt();
 
@@ -108,6 +95,8 @@ void draw() {
   // pads
   if (calibrate) {
     court.setBallPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
+    //playerR.
+    
     updateServo("A", map(court.ball.p.y, 1.0, 0.0, padR_min/255.0, padR_max/255.0));
     updateServo("B", map(court.ball.p.y, 1.0, 0.0, padL_min/255.0, padL_max/255.0));
   } else {
@@ -127,16 +116,7 @@ void draw() {
 }
 
 public void drawCourt() {
-  //court.clear();
-  //court.drawPad(playerR);
-  //court.drawPad(playerL);
-  //court.drawBall();
-  //PVector bounce = court.bounce();
-  //court.drawCollision(bounce);
-  //court.drawReflection(bounce, court.getReflection(bounce));
-
-  //court.drawCollision(court.getCollisionWithPad(playerR));
-  //court.drawCollision(court.getCollisionWithPad(playerL));
+ 
   
  image(court.render(),feed.width*1.5, 0);
  

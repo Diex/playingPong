@@ -7,7 +7,6 @@ class Pad {
 
   PVector p;
   int side = RIGHT; 
-  float xpos;
   Court court;
 
   Pad(Court c) {
@@ -15,9 +14,9 @@ class Pad {
     this.court = c;
   }
 
-  void setxPos(float x) {
-    xpos = x;
-    p.x = xpos;
+  void setPos(float x, float y) {
+    p.x = x;
+    p.y = y;
   }
 
   float follow() {

@@ -16,8 +16,8 @@ class Court {
   float yy2 = 422;
   float xx1 = 105;
   float xx2 = 618;
-  
-  
+
+
   Ball ball;
 
   Court(PApplet parent, int w, int h) {
@@ -53,7 +53,7 @@ class Court {
     float nx = PApplet.map(screenX, xx1, xx2, 0.0, 1.0) ;
     float ny = PApplet.map(screenY, yy1, yy2, 0.0, 1.0);
     println("ball position: ", nx, ny);
-    return new PVector(nx, ny);
+    return new PVector(screenX, screenY);
   }
 
   void setBallPosition(float x, float y) {
@@ -61,12 +61,11 @@ class Court {
     ball.pp.y = ball.p.y;
     ball.p.x = ease(x, ball.pp.x, 0.95);
     ball.p.y = ease(y, ball.pp.y, 0.95);
-    
   }
 
   public PVector bounce() {
     PVector collision = new PVector();
-    
+
     Vect2[] line1 = new Vect2[ 2 ];
     line1[ 0 ] = new Vect2( ball.p.x, ball.p.y );
     line1[ 1 ] = new Vect2( ball.p.x + ball.dir().x, ball.p.y + ball.dir().y );
@@ -74,7 +73,7 @@ class Court {
     Vect2[]line2 = new Vect2[ 2 ];
 
     if (court.ball.dir().y <= 0) { // choca arriba
-      
+
       //println("rebota arriba");
       line2[ 0 ] = new Vect2((float) top.getX1(), (float) top.getY1());
       line2[ 1 ] = new Vect2((float) top.getX2(), (float) top.getY2()); // will be updateed by the mouse
@@ -87,7 +86,7 @@ class Court {
     Vect2 intersectionPoint = Space2.lineIntersection( line1[ 0 ], line1[ 1 ], line2[ 0 ], line2[ 1 ] );
 
     if ( intersectionPoint != null ) {
-//      println("ÏNTERSECTION");
+      //      println("ÏNTERSECTION");
       collision.x = intersectionPoint.x;
       collision.y = intersectionPoint.y;
     }
@@ -138,33 +137,119 @@ class Court {
       collision.x = intersectionPoint.x;
       collision.y = intersectionPoint.y;
     }
-    
+
     return collision;
   }
-  
+
   public PVector getCollisionWithPad(Pad p) {
 
     PVector collision = getCollision(ball.p, ball.dir(), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
-    
+
     if (collision != null && collision.y > 0.0 && collision.y < 1.0) {        
-   //   println("colision en: ", collision.x, collision.y);  
+      //   println("colision en: ", collision.x, collision.y);  
       // itero sobre los bounces
-        return collision;        
-        
-    }else{
- //       println("buscar refleccion: ");
-        PVector bounce = bounce();        
-        collision = getCollision(bounce, getReflection(bounce), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
- //       println("refleccion en: ", collision.x , collision.y);
-        return collision;        
+      return collision;
+    } else {
+      //       println("buscar refleccion: ");
+      PVector bounce = bounce();        
+      collision = getCollision(bounce, getReflection(bounce), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
+      //       println("refleccion en: ", collision.x , collision.y);
+      return collision;
     }
-    
-    
   }
+
+
+
+
+
+  void drawCollision(PVector p) {
+    pg.beginDraw();
+    pg.pushStyle();
+    pg.fill(255, 0, 0);
+    pg.ellipse( 
+      PApplet.map((float) p.x, 0, 1, xx1, xx2), 
+      PApplet.map((float) p.y, 0, 1, yy1, yy2), 
+      10, 10
+      );   
+    pg.popStyle();
+    pg.endDraw();
+  }
+
+
+
+
+
+  void drawReflection(PVector collision, PVector newdir) {
+    pg.beginDraw();
+    pg.pushStyle();
+    pg.noFill();
+    pg.stroke(0, 0, 255);
+    pg.ellipse( 
+      PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
+      PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
+      12, 12
+      );   
+
+
+    pg.strokeWeight(0.5);
+    pg.stroke(255, 255, 255);
+    // direction
+    pg.line(
+      PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
+      PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
+      PApplet.map((float) collision.x, 0, 1, xx1, xx2) + newdir.x * 500, 
+      PApplet.map((float) collision.y, 0, 1, yy1, yy2) + newdir.y * 500
+      );
+
+    pg.strokeWeight(0.51);
+    pg.stroke(255, 255, 255);
+    // crosshatch
+    pg.line(
+      PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy1, 
+      PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy2);
+    pg.line(
+      xx1, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
+      xx2, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2));
+
+    pg.popStyle();
+    pg.endDraw();
+  }
+
+  PImage render() {
+
+    clear();
+    drawLimits();
+    drawPad(playerR);
+    drawPad(playerL);
+    court.drawBall();
+    //PVector bounce = court.bounce();
+    //court.drawCollision(bounce);
+    //court.drawReflection(bounce, court.getReflection(bounce));
+
+    //court.drawCollision(court.getCollisionWithPad(playerR));
+    //court.drawCollision(court.getCollisionWithPad(playerL));
+
+
+    return pg;
+  }
+
 
   void clear() {
     pg.beginDraw();
     pg.background(0, 0);
+    pg.endDraw();
+  }
+
+  void drawLimits() {
+    pg.beginDraw();
+    pg.pushStyle();
+    pg.strokeWeight(3);
+    pg.stroke(255, 0, 0);
+    for (Line2D line : limits) {
+      pg.line((float) line.getX1() * bg.width, (float) line.getY1() * bg.height, (float) line.getX2()* bg.width, (float) line.getY2() * bg.height);
+    }
+
+    pg.popStyle();
     pg.endDraw();
   }
 
@@ -175,29 +260,14 @@ class Court {
     pg.fill(255, 0, 0);
     pg.rectMode(PConstants.CENTER); 
     pg.rect(
-    PApplet.map((float) p.p.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) p.p.y, 0, 1, yy1, yy2), 
-    8, 
-    30);
+      p.p.x * pg.width,
+      p.p.y * pg.height,
+      8, 
+      30);
 
     pg.popStyle();
     pg.endDraw();
   }
-
-
-  void drawCollision(PVector p) {
-    pg.beginDraw();
-    pg.pushStyle();
-    pg.fill(255, 0, 0);
-    pg.ellipse( 
-    PApplet.map((float) p.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) p.y, 0, 1, yy1, yy2), 
-    10, 10
-      );   
-    pg.popStyle();
-    pg.endDraw();
-  }
-
 
   void drawBall() {
     pg.beginDraw();
@@ -205,8 +275,8 @@ class Court {
     pg.fill(0, 255, 0);
     // ball
     pg.ellipse( 
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
+    ball.p.x * pg.width,
+    ball.p.y * pg.height,
     10, 10
       );   
 
@@ -216,82 +286,27 @@ class Court {
     pg.stroke(255, 255, 0);
     // direction
     pg.line(
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2) + dir.x * 500, 
-    PApplet.map((float) ball.p.y, 0, 1, yy1, yy2) + dir.y * 500
-      );
+      ball.p.x * pg.width, 
+      ball.p.y * pg.height, 
+      ball.p.x * pg.width + dir.x * 500, 
+      ball.p.y * pg.height + dir.y * 500      
+     );
 
     pg.strokeWeight(0.51);
     pg.stroke(255, 255, 255);
     // crosshatch
     pg.line(
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy1, 
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy2);
+     ball.p.x * pg.width, 0,
+     ball.p.x * pg.width, pg.height
+     );
+    
     pg.line(
-    xx1, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
-    xx2, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2));
+      0, ball.p.y * pg.height,
+      pg.width, ball.p.y * pg.height);
 
     pg.popStyle();
     pg.endDraw();
   }
-
-
-  void drawReflection(PVector collision, PVector newdir) {
-    pg.beginDraw();
-    pg.pushStyle();
-    pg.noFill();
-    pg.stroke(0, 0, 255);
-    pg.ellipse( 
-    PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
-    12, 12
-      );   
-
-
-    pg.strokeWeight(0.5);
-    pg.stroke(255, 255, 255);
-    // direction
-    pg.line(
-    PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
-    PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
-    PApplet.map((float) collision.x, 0, 1, xx1, xx2) + newdir.x * 500, 
-    PApplet.map((float) collision.y, 0, 1, yy1, yy2) + newdir.y * 500
-      );
-
-    pg.strokeWeight(0.51);
-    pg.stroke(255, 255, 255);
-    // crosshatch
-    pg.line(
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy1, 
-    PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy2);
-    pg.line(
-    xx1, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
-    xx2, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2));
-
-    pg.popStyle();
-    pg.endDraw();
-  }
-
-  PImage render() {
-    pg.beginDraw();
-    pg.pushStyle();
-    pg.strokeWeight(3);
-    pg.stroke(255, 0, 0);
-    for (Line2D line : limits) {
- 
-      pg.line((float) line.getX1() * bg.width, (float) line.getY1() * bg.height,  (float) line.getX2()* bg.width, (float) line.getY2() * bg.height);
-      
-      //PApplet.map((float) line.getX1(), 0, 1, xx1, xx2), 
-      //PApplet.map((float) line.getY1(), 0, 1, yy1, yy2), 
-      //PApplet.map((float) line.getX2(), 0, 1, xx1, xx2), 
-      //PApplet.map((float) line.getY2(), 0, 1, yy1, yy2));
-    }
-    pg.popStyle();
-    pg.endDraw();
-    return pg;
-  }
-
   float ease(float current, float last, float factor) {
     return current * factor + last * (1 - factor);
   }
