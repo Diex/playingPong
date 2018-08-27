@@ -69,7 +69,7 @@ void draw() {
 
   // pads
   if (calibrate) {
-    court.setBallPosition(ballPos.arrayValue()[0] * 1.0 / 100, ballPos.arrayValue()[1] * 1.0 / 100);
+    court.setBallPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
     updateServoR(map(court.ball.p.y, 1, 0, padR_min, padR_max));
     updateServoL(map(court.ball.p.y, 1, 0, padL_min, padL_max));
     println(1 - court.ball.p.y);
@@ -121,4 +121,3 @@ void keyPressed() {
   if (key == 's') cp5.saveProperties();
   if (key == 'l') cp5.loadProperties();
 }
-

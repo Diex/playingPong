@@ -1,4 +1,4 @@
-//import point2line.*;
+import point2line.*;
 
 class Pad {
   // my side of the court
