@@ -12,11 +12,6 @@ class Court {
 
   Line2D[] limits;
 
-  float yy1 = 58;
-  float yy2 = 422;
-  float xx1 = 105;
-  float xx2 = 618;
-
 
   Ball ball;
 
@@ -40,21 +35,9 @@ class Court {
 
   void update(Blob blob) {
     if (blob == null) return;    
-    PVector v = getCourtPositionFromBlob(blob);    
-    setBallPosition(v.x, v.y);
+    setBallPosition(blob.x, blob.y);
   }
 
-  PVector getCourtPositionFromBlob(Blob blob) {
-    // normalized blob to screen
-    // porque el blob detection esta viendo toda la imagen
-    float screenX = PApplet.map(blob.x, 0, 1, 0, pg.width);
-    float screenY = PApplet.map(blob.y, 0, 1, 0, pg.height);
-    // screen to norm limits frame
-    float nx = PApplet.map(screenX, xx1, xx2, 0.0, 1.0) ;
-    float ny = PApplet.map(screenY, yy1, yy2, 0.0, 1.0);
-    println("ball position: ", nx, ny);
-    return new PVector(screenX, screenY);
-  }
 
   void setBallPosition(float x, float y) {
     ball.pp.x = ball.p.x;
@@ -62,6 +45,7 @@ class Court {
     ball.p.x = ease(x, ball.pp.x, 0.95);
     ball.p.y = ease(y, ball.pp.y, 0.95);
   }
+
 
   public PVector bounce() {
     PVector collision = new PVector();
@@ -146,7 +130,6 @@ class Court {
     PVector collision = getCollision(ball.p, ball.dir(), new PVector(p.p.x, 0), new PVector(p.p.x, 1));
 
     if (collision != null && collision.y > 0.0 && collision.y < 1.0) {        
-      //   println("colision en: ", collision.x, collision.y);  
       // itero sobre los bounces
       return collision;
     } else {
@@ -167,8 +150,9 @@ class Court {
     pg.pushStyle();
     pg.fill(255, 0, 0);
     pg.ellipse( 
-      PApplet.map((float) p.x, 0, 1, xx1, xx2), 
-      PApplet.map((float) p.y, 0, 1, yy1, yy2), 
+    p.x * pg.width,
+    p.y * pg.height,
+    
       10, 10
       );   
     pg.popStyle();
@@ -185,8 +169,9 @@ class Court {
     pg.noFill();
     pg.stroke(0, 0, 255);
     pg.ellipse( 
-      PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
-      PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
+    collision.x * pg.width,
+    collision.y * pg.height,
+    
       12, 12
       );   
 
@@ -195,21 +180,26 @@ class Court {
     pg.stroke(255, 255, 255);
     // direction
     pg.line(
-      PApplet.map((float) collision.x, 0, 1, xx1, xx2), 
-      PApplet.map((float) collision.y, 0, 1, yy1, yy2), 
-      PApplet.map((float) collision.x, 0, 1, xx1, xx2) + newdir.x * 500, 
-      PApplet.map((float) collision.y, 0, 1, yy1, yy2) + newdir.y * 500
+    collision.x * pg.width,
+    collision.y * pg.height,
+    collision.x * pg.width  + newdir.x * 500,
+    collision.y * pg.height + newdir.y * 500
+     
       );
 
     pg.strokeWeight(0.51);
     pg.stroke(255, 255, 255);
     // crosshatch
+    // crosshatch
     pg.line(
-      PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy1, 
-      PApplet.map((float) ball.p.x, 0, 1, xx1, xx2), yy2);
+     ball.p.x * pg.width, 0,
+     ball.p.x * pg.width, pg.height
+     );
+    
     pg.line(
-      xx1, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2), 
-      xx2, PApplet.map((float) ball.p.y, 0, 1, yy1, yy2));
+      0, ball.p.y * pg.height,
+      pg.width, ball.p.y * pg.height
+      );
 
     pg.popStyle();
     pg.endDraw();
@@ -222,6 +212,7 @@ class Court {
     drawPad(playerR);
     drawPad(playerL);
     court.drawBall();
+    
     //PVector bounce = court.bounce();
     //court.drawCollision(bounce);
     //court.drawReflection(bounce, court.getReflection(bounce));
@@ -302,7 +293,8 @@ class Court {
     
     pg.line(
       0, ball.p.y * pg.height,
-      pg.width, ball.p.y * pg.height);
+      pg.width, ball.p.y * pg.height
+      );
 
     pg.popStyle();
     pg.endDraw();

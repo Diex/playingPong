@@ -1,9 +1,15 @@
 BlobDetection theBlobDetection;
 PGraphics bd;
-float x1 = 0.185;
-float x2 = 0.84;
-float y1 = 0.13;
-float y2 = 0.89;
+//float x1 = 0.185;
+//float x2 = 0.84;
+//float y1 = 0.13;
+//float y2 = 0.89;
+
+float x1 = 0.1;
+float x2 = 0.9;
+float y1 = 0;
+float y2 = 1;
+
 ArrayList<Blob> valid;
 
 void setupBD(PImage src) {
@@ -24,7 +30,7 @@ void detectBlobs(PImage img) {
   bd.endDraw();
   
   for (Blob b : filterSize) {
-    drawBlobAndEdge(b, true, true);
+    //drawBlobAndEdge(b, true, true);
   }
   valid = filterSize;
   

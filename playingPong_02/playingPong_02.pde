@@ -95,12 +95,13 @@ void draw() {
   // pads
   if (calibrate) {
     court.setBallPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
-    //playerR.
-    
+     
     updateServo("A", map(court.ball.p.y, 1.0, 0.0, padR_min/255.0, padR_max/255.0));
     updateServo("B", map(court.ball.p.y, 1.0, 0.0, padL_min/255.0, padL_max/255.0));
   } else {
-    court.update(getMovingBlob());
+    Blob b = getMovingBlob();
+    court.update(b);
+    
     updateServo("A", map(playerR.follow(), 1, 0, padR_min/255.0, padR_max/255.0));
     updateServo("B", map(playerL.follow(), 1, 0, padL_min/255.0, padL_max/255.0));
   }
