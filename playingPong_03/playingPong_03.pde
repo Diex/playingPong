@@ -5,20 +5,23 @@ import cc.arduino.*;
 import gab.opencv.*;
 import blobDetection.*;
 
-Court court;
 
 
 PImage cv;
 PImage feed;
 PImage pfeed;
 PImage blur;
-
 PImage difference;
 
 Pad playerR;
 Pad playerL;
-boolean calibrate = false; 
 
+Ball b;
+
+Court court;
+
+
+boolean calibrate = false; 
 int padR_min, padL_min = 0;
 int padR_max, padL_max = 255;
 
@@ -30,84 +33,70 @@ void setup() {
   setupArduino();
   setupCam();  
   feed = updateCam();
-  pfeed = new PImage(640,480);
+  pfeed = new PImage(640, 480);
 
   setupBD(feed);
   setupFilters(feed);
-  
+
   setupGUI();
   cp5.loadProperties();
-  
+
   // ----------------------------------------------------------------------
   // juego
   // ----------------------------------------------------------------------
 
   court = new Court(this, feed.width, feed.height);
 
-  playerR = new Pad(court);
+  playerR = new Pad();
   playerR.side = Pad.RIGHT;
   playerR.setPos(0.97, 0.5);
 
-  playerL = new Pad(court);
+  playerL = new Pad();
   playerL.side = Pad.LEFT;  
   playerL.setPos(0.03, 0.5);
+
+  b = new Ball();
 }
 
 void draw() {
   background(0);
-  
+
   feed = updateCam();
   int w = feed.width;
   int h = feed.height;
-  
-  image(feed, 0,0);  // el tamanno de feed depende del ROI (devuelve un PImage de esas dimensiones)
-  
+
+  image(feed, 0, 0);  // el tamanno de feed depende del ROI (devuelve un PImage de esas dimensiones)
+
   cv = getCV();
-  image(cv, w, 0, w/2,h/2);
-  
+
   difference = getdiff(cv);  
   setBackground(cv);
-  
-  image(difference, w, h/2, w/2,h/2);  
+
   detectBlobs(difference);
-   
-  image(bd, w+w/2, 0   );
 
+  image(cv, w, 0, w/2, h/2);
+  image(difference, w, h/2, w/2, h/2);  
+  image(bd, w+w/2, 0, w/2, h/2);
 
-  // pads
   if (calibrate) {
-    court.setBallPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
-    updateServo("A", map(court.ball.p.y, 1.0, 0.0, padR_min/255.0, padR_max/255.0));
-    updateServo("B", map(court.ball.p.y, 1.0, 0.0, padL_min/255.0, padL_max/255.0));
+    b.setPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
   } else {
-    Blob b = getMovingBlob();
-    court.update(b);
-    
-    updateServo("A", map(playerR.follow(), 1, 0, padR_min/255.0, padR_max/255.0));
-    updateServo("B", map(playerL.follow(), 1, 0, padL_min/255.0, padL_max/255.0));
+    Blob blob = getMovingBlob();
+    if (blob != null) b.setPosition(blob.x, blob.y);
   }
+  updateServo("A", map(playerR.follow(court, this.b), 1, 0, padR_min/255.0, padR_max/255.0));
+  updateServo("B", map(playerL.follow(court, this.b), 1, 0, padL_min/255.0, padL_max/255.0));
 
- 
- drawControls();
- drawCourt();
-
+  drawCourt();
+  drawControls();
 }
 
 public void drawCourt() {
- image(court.render(),feed.width*1.5, 0);
+  image(court.render(b, playerR, playerL), 0, 0);
 }
 
 
-public void centerPads() {
-  println("center pads");
-  //updateServoR(map(0.5, 0, 1, 45, 145) - 10 );
-  //updateServoL(map(0.5, 0, 1, 45, 145) - 10 );
-}
 
-public void calibrate(boolean flag) {
-  println("Calibrate");
-  calibrate = flag;
-}
 
 
 void keyPressed() {
