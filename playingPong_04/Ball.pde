@@ -17,8 +17,8 @@ class Ball {
   void setPosition(float x, float y) {
     ppos.x = pos.x;
     ppos.y = pos.y;
-    //println(x, y);
-    pos.x = ease(x, ppos.x, 0.5);
+    
+    pos.x =  ease(x, ppos.x, 0.5);
     pos.y = ease(y, ppos.y, 0.5);
   }
   
