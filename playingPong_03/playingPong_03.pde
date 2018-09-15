@@ -80,12 +80,20 @@ void draw() {
 
   if (calibrate) {
     b.setPosition(ballPos.getArrayValue()[0] * 1.0 / 100, ballPos.getArrayValue()[1] * 1.0 / 100);
+    updateServo("A", map(b.pos.y, 1, 0, padR_min/255.0, padR_max/255.0));
+    updateServo("B", map(b.pos.y, 1, 0, padL_min/255.0, padL_max/255.0));
   } else {
     Blob blob = getMovingBlob();
-    if (blob != null) b.setPosition(blob.x, blob.y);
+    if (blob != null) {
+      b.setPosition(blob.x, blob.y);
+    
+    }
+
+    updateServo("A", map(playerR.follow(court, this.b), 1, 0, padR_min/255.0, padR_max/255.0));
+    updateServo("B", map(playerL.follow(court, this.b), 1, 0, padL_min/255.0, padL_max/255.0));
   }
-  updateServo("A", map(playerR.follow(court, this.b), 1, 0, padR_min/255.0, padR_max/255.0));
-  updateServo("B", map(playerL.follow(court, this.b), 1, 0, padL_min/255.0, padL_max/255.0));
+
+
 
   drawCourt();
   drawControls();
@@ -96,7 +104,9 @@ public void drawCourt() {
 }
 
 
-
+void SerialEvent(Serial port) {
+  println(port.readString());
+}
 
 
 void keyPressed() {

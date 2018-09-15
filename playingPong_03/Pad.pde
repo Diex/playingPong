@@ -5,6 +5,7 @@ class Pad {
   final static int LEFT = -1;
   final static int RIGHT = 1;
 
+  
   PVector p;
   int side = RIGHT; 
   
@@ -19,6 +20,7 @@ class Pad {
 
   float follow(Court court, Ball ball) {
     if ((int) Math.signum(ball.dir().x) != side) {
+      p.y = 0.5;
       return p.y;
     }
     PVector collision = Collisions.getCollisionWithPad(court, this, ball);

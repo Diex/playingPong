@@ -35,8 +35,8 @@ class Court {
 
     clear();
     drawLimits();
-    drawPad(r);
-    drawPad(l);
+   // drawPad(r);
+   // drawPad(l);
     drawBall(ball);
     
     PVector bounce = Collisions.bounce(this, ball);

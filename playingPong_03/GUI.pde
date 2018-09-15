@@ -104,7 +104,7 @@ void setupGUI() {
   // -----------------------------------------------------------------------------------------------
 
   Group detectGroup = cp5.addGroup("detect")
-    .setPosition(320, 500)
+    .setPosition(320, 600)
     .setWidth(200)
     .activateEvent(true)
     .setBackgroundColor(color(0, 200))
