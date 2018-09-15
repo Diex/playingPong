@@ -39,9 +39,9 @@ class Court {
    // drawPad(l);
     drawBall(ball);
     
-    PVector bounce = Collisions.bounce(this, ball);
-    court.drawCollision(bounce);
-    court.drawReflection(bounce, Collisions.reflection(bounce, ball), ball);
+    //PVector bounce = Collisions.bounce(this, ball);
+    //court.drawCollision(bounce);
+    //court.drawReflection(bounce, Collisions.reflection(bounce, ball), ball);
 
     court.drawCollision(Collisions.getCollisionWithPad(this, r, ball));
     court.drawCollision(Collisions.getCollisionWithPad(this, l, ball));

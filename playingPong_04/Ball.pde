@@ -18,8 +18,8 @@ class Ball {
     ppos.x = pos.x;
     ppos.y = pos.y;
     
-    pos.x =  ease(x, ppos.x, 0.5);
-    pos.y = ease(y, ppos.y, 0.5);
+    pos.x =  ease(x, ppos.x, 0.99);
+    pos.y = ease(y, ppos.y, 0.99);
   }
   
   

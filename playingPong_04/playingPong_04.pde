@@ -91,7 +91,7 @@ void draw() {
    updateServo("B", map(playerR.follow(court, b), 1, 0, padR_min/255.0, padR_max/255.0));
    updateServo("A", map(playerL.follow(court, b), 1, 0, padL_min/255.0, padL_max/255.0));
     
-    println(b.pos.y, playerR.p.y);
+    println(b.pos.y, playerL.p.y, map(playerL.follow(court, b), 1, 0, padL_min/255.0, padL_max/255.0));
   }
 
    
