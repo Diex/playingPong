@@ -1,0 +1,88 @@
+{
+  "/blurLevel": {
+    "min": 1,
+    "max": 105,
+    "value": 58.77777862548828
+  },
+  "/minSize": {
+    "min": 30,
+    "max": 100,
+    "value": 100
+  },
+  "/padR_min": {
+    "min": 0,
+    "max": 255,
+    "value": 0
+  },
+  "/maxDefects": {
+    "min": 1,
+    "max": 25,
+    "value": 1
+  },
+  "/gain": {
+    "min": 0.009999999776482582,
+    "max": 4,
+    "value": 4
+  },
+  "/ballPosition": {
+    "minY": 0,
+    "minX": 0,
+    "maxY": 100,
+    "maxX": 100,
+    "arrayValue": [
+      63.82978439331055,
+      94.68085479736328
+    ]
+  },
+  "/padL_min": {
+    "min": 0,
+    "max": 255,
+    "value": 0
+  },
+  "/diffMaxValue": {
+    "min": 0,
+    "max": 1,
+    "value": 0.5353535413742065
+  },
+  "/maxSize": {
+    "min": 50,
+    "max": 200,
+    "value": 171.21212768554688
+  },
+  "/cvth": {
+    "min": 1,
+    "max": 100,
+    "value": 4
+  },
+  "/calibrate": {"value": 0},
+  "/padR_max": {
+    "min": 0,
+    "max": 255,
+    "value": 208.63636779785156
+  },
+  "/maxAverage": {
+    "min": 10,
+    "max": 250,
+    "value": 10
+  },
+  "/maxSegments": {
+    "min": 4,
+    "max": 35,
+    "value": 4
+  },
+  "/maxArea": {
+    "min": 2000,
+    "max": 6000,
+    "value": 2000
+  },
+  "/diffMinValue": {
+    "min": 0,
+    "max": 1,
+    "value": 0.03030303120613098
+  },
+  "/padL_max": {
+    "min": 0,
+    "max": 255,
+    "value": 218.93939208984375
+  }
+}
