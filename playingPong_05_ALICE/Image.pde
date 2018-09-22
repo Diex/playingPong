@@ -14,7 +14,7 @@ void setupCam() {
   cam = new IPCapture(this, feedUrl, "", "");
   cam.start();
   // HINT si tironea saco true para que funcione en gray
-  opencv = new OpenCV(this, camClean,false);
+  opencv = new OpenCV(this, camClean,true);
 }
 
 PImage updateCam() {
